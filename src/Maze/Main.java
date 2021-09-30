@@ -162,6 +162,7 @@ public class Main {
             for (int j = 0; j < mazeMap[0].length; j++) {
                 mazeNodes[i][j] = new Node(i, j, mazeMap[i][j]);
             }
+            System.out.println("");
         }
         mazeAStar();
         //mazeHeuristic(4, 4, 0);
@@ -171,8 +172,8 @@ public class Main {
         //choose and setup start node
         Node current = mazeNodes[3][3];
         current.visited = true;
-        current.weight = 0;
-        current.h = calcHeuristic(3,3);
+        current.setWeight(0);
+        current.setH(calcHeuristic(3,3));
         //create offsets for the loop
         int[][] offsets = {{0, 1},{1,0},{0,-1},{-1, 0}};
         Node temp;
@@ -190,18 +191,27 @@ public class Main {
                     if(temp.type != 0){
                         //if not a wall
                         if(!temp.visited){
+                            //if not visited add to queue and calc heuristic
                             pQueue.add(temp);
                             temp.setH(calcHeuristic(a,b));
                             temp.visited = true;
                         }
                         if(temp.weight > current.weight + 1){
-                            temp.weight = current.weight + 1;
+                            temp.setWeight(current.weight + 1);
                             temp.connect = current;
                         }
                     }
-
                 }
             }
+            //print priority map
+            for (int i = 0; i < mazeNodes.length; i++) {
+                for (int j = 0; j < mazeNodes[0].length; j++) {
+                    System.out.print(mazeNodes[i][j].priority+"\t");
+                }
+                System.out.println("");
+            }
+
+            //find node with lowest cost in pQueue
             Node lowestNode = pQueue.get(0);
             for (Node x : pQueue) {
                 if(x.priority < lowestNode.priority){
@@ -209,12 +219,18 @@ public class Main {
                 }
             }
             current = lowestNode;
+            //remove lowest cost node from pqueue
+            pQueue.remove(current);
         }
 
+        //print pathj
+        int counter = -1;
         while(current != null){
             System.out.println("("+current.x+", "+current.y+")");
             current = current.connect;
+            counter++;
         }
+        System.out.println("goal found in " +counter+" steps!");
     }
 
 
@@ -309,8 +325,8 @@ class Node{
         this.x = x;
         this.y = y;
         this.type = type;
-        h = 1000;
-        weight= 1000;
+        h = 100;
+        weight= 100;
         priority = h + weight;
         connect = null;
     }
